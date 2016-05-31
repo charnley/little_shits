@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+
+from __future__ import division
+from subprocess import Popen, PIPE
+
+import sys
+
+def shell(cmd):
+    cmd = cmd.split()
+    p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    output, err = p.communicate()
+    return output
+
+
+def compare_two(filea, fileb):
+    """
+
+    @return number of lines in file A
+    @return number of lines in file B
+    @return number of git additions
+    @return number of git deletions
+    """
+
+    # number of lines
+    nla = shell("wc -l " + filea)
+    nlb = shell("wc -l " + fileb)
+
+    nla = int(nla.split()[0])
+    nlb = int(nlb.split()[0])
+
+    git = shell('git diff --numstat --ignore-space-at-eol -b -w --ignore-blank-lines ' + filea + ' ' + fileb)
+    git = git.split()
+    gitadd = int(git[0])
+    gitdelete = int(git[1])
+
+    return nla, nlb, gitadd, gitdelete
+
+
+if __name__ == "__main__":
+
+    # TODO Delete all comments
+    # ignore?
+
+    args = sys.argv[1:]
+
+    filea = args[0]
+    fileb = args[1]
+
+    nla, nlb, ga, gd = compare_two(filea, fileb)
+
+    print nla, nlb, ga, gd
+
+    print (ga+gd)/(nla+nlb)
+
