@@ -2,8 +2,8 @@
 
 from __future__ import division
 from subprocess import Popen, PIPE
-
 import sys
+import re
 
 def shell(cmd):
     cmd = cmd.split()
@@ -23,9 +23,17 @@ def clean_file(filename):
         if "import" in line:
             continue
 
+        # Remove all comments
         line = line.replace('\n', '')
         line = line.split('#')
-        content += line[0] + "\n"
+        line = line[0]
+
+        # Remove trailing spaces and linechange
+        line = line.rstrip()
+        if not line:
+            continue
+
+        content += line + "\n"
 
     f = open(filetest, 'w')
     f.write(content)
